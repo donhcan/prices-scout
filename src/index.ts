@@ -37,10 +37,10 @@ function parseProducts(): void {
     const staticHTML = fs.readFileSync('products.html')
     const $ = cheerio.load(staticHTML)
 
-    // Get the comments section
+    // Get the products section
     const productsSection = $('.prd a.core')
 
-    // Iterate each comment
+    // Iterate each product
     const products = []
 
     productsSection.each((index, prd) => {

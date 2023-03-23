@@ -126,7 +126,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-#products
+# products
 
 products.html
 products.json

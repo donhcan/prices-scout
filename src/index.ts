@@ -2,11 +2,13 @@ import fs from 'fs'
 import puppeteer from 'puppeteer'
 import * as cheerio from 'cheerio'
 
+// Define ProductType interface with name and price properties
 interface ProductType {
     name: string
     price: string
 }
 
+// Get content from the given URL using Puppeteer and write it to a file
 async function getContent(url: string): Promise<void> {
 
     // Open the browser and a new tab
@@ -23,14 +25,16 @@ async function getContent(url: string): Promise<void> {
     console.log("Got the HTML. Check the products .html file.")
 }
 
+// Main function
 async function main() {
 
-
+    // Set the target URL
     const targetURL = 'https://www.jumia.ug/catalog/?q=sugar+1kg'
     await getContent(targetURL)
     parseProducts()
 }
 
+// Parse the products from the HTML file and write the results to external file
 function parseProducts(): void {
 
     // Load the HTML document

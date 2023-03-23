@@ -26,7 +26,7 @@ async function getContent(url: string): Promise<void> {
 async function main() {
 
 
-    const targetURL = 'https://www.jumia.com.ng/sugars/'
+    const targetURL = 'https://www.jumia.ug/catalog/?q=sugar+1kg'
     await getContent(targetURL)
     parseProducts()
 }

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx tsc && node dist/index.js",
-    "parse": "npx tsc && node dist/reddit.js"
+    "test": "npx tsc && node dist/index.js"
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,6 @@
 import puppeteer from 'puppeteer';
-import "reflect-metadata";
-import { DataSource } from 'typeorm';
-import { Product } from './entity/Product';
+// import { createConnection } from 'typeorm';
+// import { Product } from './entities/Product';
 
 const COUNTRIES = {
     'Uganda': 'https://www.jumia.ug',
@@ -28,29 +27,19 @@ const COUNTRIES = {
 
     console.log(products);
   
-    const AppDataSource = new DataSource({
-        type: "postgres",
-        host: "127.0.0.1",
-        port: 5432,
-        username: "test",
-        password: "test",
-        database: "test",
-        entities: [Product],
-        synchronize: true,
-        logging: false,
-    })
+    // const connection = await createConnection();
+    // const repository = connection.getRepository(Product);
   
+    // const today = new Date();
+    // for (const product of products) {
+    //   const dbProduct = new Product();
+    //   dbProduct.name = product.name;
+    //   dbProduct.price = product.price ? parseFloat(product.price.trim().replace(",", "")) : null;
+    //   dbProduct.country = "Nigeria";
+    //   dbProduct.date = today;
   
-    const today = new Date();
-    for (const product of products) {
-      const dbProduct = new Product();
-      dbProduct.name = product.name;
-      dbProduct.price = product.price ? parseFloat(product.price.trim().replace(",", "")) : null;
-      dbProduct.country = "Nigeria";
-      dbProduct.date = today;
-  
-      await AppDataSource.manager.save(dbProduct);
-    }
+    //   await repository.save(dbProduct);
+    // }
   
     await browser.close();
     console.log("Scraping done!");

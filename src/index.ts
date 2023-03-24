@@ -1,68 +1,63 @@
-import puppeteer from 'puppeteer';
-import "reflect-metadata";
-import { DataSource } from 'typeorm';
-import { Product } from './entity/Product';
+import fs from 'fs'
+import puppeteer from 'puppeteer'
+import * as cheerio from 'cheerio'
 
-const COUNTRIES = {
-    'Uganda': 'https://www.jumia.ug',
-    'Kenya': 'https://www.jumia.co.ke',
-    'Nigeria': 'https://www.jumia.com.ng',
-  };
+// Define ProductType interface with name and price properties
+interface ProductType {
+    name: string
+    price: string
+}
 
-  async function scrapeJumia(): Promise<void> {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    const url ='https://www.jumia.ug/catalog/?q=sugar+1kg';
-    await page.goto(url);
-  
-    const products = await page.$$eval(".prd a.core", (items) =>
-      items.map((item) => {
-        const name = item.querySelector("h3")?.textContent;
-        const price = item.querySelector(".prc")?.textContent;
-        return {
-          name,
-          price,
-        };
-      })
-    );
+// Get content from the given URL using Puppeteer and write it to a file
+async function getContent(url: string): Promise<void> {
 
-    console.log(products);
-  
-    const AppDataSource = new DataSource({
-        type: "postgres",
-        host: "127.0.0.1",
-        port: 5432,
-        username: "test",
-        password: "test",
-        database: "test",
-        entities: [Product],
-        synchronize: true,
-        logging: false,
+    // Open the browser and a new tab
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+
+    // Navigate to the URL and write the content to file
+    await page.goto(url)
+    const pageContent = await page.content()
+    fs.writeFileSync("products.html", pageContent)
+
+    // Close the browser
+    await browser.close()
+    console.log("Got the HTML. Check the products .html file.")
+}
+
+// Main function
+async function main() {
+
+    // Set the target URL
+    const targetURL = 'https://www.jumia.ug/catalog/?q=sugar+1kg'
+    await getContent(targetURL)
+    parseProducts()
+}
+
+// Parse the products from the HTML file and write the results to external file
+function parseProducts(): void {
+
+    // Load the HTML document
+    const staticHTML = fs.readFileSync('products.html')
+    const $ = cheerio.load(staticHTML)
+
+    // Get the products section
+    const productsSection = $('.prd a.core')
+
+    // Iterate each product
+    const products = []
+
+    productsSection.each((index, prd) => {
+        const product: ProductType = { name: '', price: '' }
+        product.name = $(prd).find('h3').text()
+        product.price = $(prd).find('.prc').text()
+        products.push(product);
     })
-  
-  
-    const today = new Date();
-    for (const product of products) {
-      const dbProduct = new Product();
-      dbProduct.name = product.name;
-      dbProduct.price = product.price ? parseFloat(product.price.trim().replace(",", "")) : null;
-      dbProduct.country = "Nigeria";
-      dbProduct.date = today;
-  
-      await AppDataSource.manager.save(dbProduct);
-    }
-  
-    await browser.close();
-    console.log("Scraping done!");
-  }
-  
 
-  async function runScraper() {
-    try {
-      await scrapeJumia();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  
-  runScraper();
+    // Write the results to external file
+    fs.writeFileSync("products.json", JSON.stringify({ products }))
+}
+
+main()
+    .then(() => { console.log("All done!") })
+    .catch(e => { console.log("Unexpected error occurred:", e.message) })
